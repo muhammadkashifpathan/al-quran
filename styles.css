@@ -44,7 +44,8 @@
     --radius-lg: 1rem;
     
     /* Typography */
-    --font-family-arabic: 'Amiri', serif;
+    --font-family-arabic: 'Scheherazade New', 'Noto Sans Arabic', 'Amiri', serif;
+    --font-family-urdu: 'Noto Nastaliq Urdu', serif;
     --font-family-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     
     /* Transitions */
@@ -565,6 +566,14 @@ body {
     margin-bottom: var(--space-md);
     padding-left: var(--space-lg);
     border-left: 3px solid hsl(var(--primary) / 0.3);
+}
+
+.ayah-translation.urdu {
+    font-family: var(--font-family-urdu);
+    direction: rtl;
+    text-align: right;
+    font-size: 1.2rem;
+    line-height: 2;
 }
 
 .word-by-word {

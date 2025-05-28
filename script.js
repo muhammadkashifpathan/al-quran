@@ -19,7 +19,7 @@ class QuranApp {
         this.settings = {
             theme: 'light',
             reciter: '7', // Mishary Rashid Alafasy
-            translation: '131', // English - Saheeh International
+            translation: 'en.sahih', // English - Saheeh International
             tafsir: '169', // Ibn Kathir
             loopMode: 'none', // none, ayah, surah
             autoScroll: true,
@@ -260,7 +260,7 @@ class QuranApp {
             // Load translation if needed
             let translationData = null;
             if (this.settings.translation !== 'none') {
-                const translationResponse = await fetch(`${this.API_BASE}/surah/${surahId}/en.sahih`);
+                const translationResponse = await fetch(`${this.API_BASE}/surah/${surahId}/${this.settings.translation}`);
                 translationData = await translationResponse.json();
             }
             
@@ -320,7 +320,7 @@ class QuranApp {
                 
                 <div class="ayah-text-arabic">${ayah.text_uthmani}</div>
                 
-                ${ayah.translation ? `<div class="ayah-translation">${ayah.translation}</div>` : ''}
+                ${ayah.translation ? `<div class="ayah-translation ${this.settings.translation.startsWith('ur.') ? 'urdu' : ''}">${ayah.translation}</div>` : ''}
                 
                 <div class="word-by-word ${this.settings.wordByWord ? 'visible' : ''}">
                     <div class="word-container">
@@ -706,19 +706,32 @@ class QuranApp {
         try {
             this.showModalLoading('tafsir');
             
-            // For now, show a simple tafsir interface
-            // In future versions, this can be connected to a tafsir API
+            // Load tafsir from AlQuran.cloud API
             const [surahNum, ayahNum] = verseKey.split(':');
-            const tafsir = {
-                text: `Tafsir for Surah ${surahNum}, Ayah ${ayahNum} will be available when connected to a tafsir service. This verse contains important guidance and wisdom from the Quran.`
-            };
+            const response = await fetch(`${this.API_BASE}/ayah/${surahNum}:${ayahNum}/editions/quran-simple,en.jalalayn`);
+            const data = await response.json();
             
-            this.displayTafsir(tafsir, verseKey);
+            if (data.data && data.data.length >= 2) {
+                const tafsir = {
+                    text: data.data[1].text || 'Tafsir not available for this verse.'
+                };
+                this.displayTafsir(tafsir, verseKey);
+            } else {
+                // Fallback if tafsir API doesn't work
+                const tafsir = {
+                    text: `This is verse ${ayahNum} from Surah ${this.currentSurah ? this.currentSurah.name_simple : surahNum}. For detailed tafsir commentary, please consult authentic Islamic sources and scholars.`
+                };
+                this.displayTafsir(tafsir, verseKey);
+            }
             
         } catch (error) {
             console.error('Error loading tafsir:', error);
-            this.showToast('Failed to load tafsir. Please try again.', 'error');
-            this.closeAllModals();
+            // Show fallback content instead of error
+            const [surahNum, ayahNum] = verseKey.split(':');
+            const tafsir = {
+                text: `This is verse ${ayahNum} from Surah ${this.currentSurah ? this.currentSurah.name_simple : surahNum}. For detailed tafsir commentary, please consult authentic Islamic sources and scholars.`
+            };
+            this.displayTafsir(tafsir, verseKey);
         }
     }
     
