@@ -422,23 +422,20 @@ class QuranApp {
             // Extract surah and ayah from verse_key (format: "1:1")
             const [surahNum, ayahNum] = verseKey.split(':');
             
-            // Use EveryAyah.com audio service with different reciters
+            // Use GitHub-hosted Quran audio service
+            // Format: /<reciterNo>/<surahNo>_<ayahNo>.mp3
             const reciterMap = {
-                '7': 'Mishary_Rashid_Alafasy_128kbps', // Mishary Rashid Alafasy
-                '1': 'Abdul_Basit_Murattal_192kbps',   // Abdul Basit
-                '2': 'Saad_Al-Ghamdi_64kbps',         // Saad Al-Ghamdi
-                '4': 'Maher_AlMuaiqly_64kbps',        // Maher Al-Muaiqly
-                '6': 'Yasser_Ad-Dussary_128kbps'      // Yasser Al-Dosari
+                '7': '2', // Mishary Rashid Alafasy
+                '1': '1', // Abdul Basit
+                '2': '3', // Saad Al-Ghamdi
+                '4': '4', // Maher Al-Muaiqly
+                '6': '5'  // Yasser Al-Dosari
             };
             
-            const reciterDir = reciterMap[this.settings.reciter] || reciterMap['7'];
+            const reciterNo = reciterMap[this.settings.reciter] || '2';
             
-            // Format ayah number with leading zeros (3 digits)
-            const formattedAyah = ayahNum.toString().padStart(3, '0');
-            const formattedSurah = surahNum.toString().padStart(3, '0');
-            
-            // Construct audio URL
-            const audioUrl = `https://www.everyayah.com/data/${reciterDir}/${formattedSurah}${formattedAyah}.mp3`;
+            // Construct audio URL using the provided format
+            const audioUrl = `https://the-quran-project.github.io/Quran-Audio/Data/${reciterNo}/${surahNum}_${ayahNum}.mp3`;
             
             return audioUrl;
             
