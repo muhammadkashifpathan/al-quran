@@ -4,7 +4,7 @@
 class QuranApp {
     constructor() {
         // API Configuration
-        this.API_BASE = 'https://api.quran.com/v4';
+        this.API_BASE = 'https://api.alquran.cloud/v1';
         
         // Application State
         this.currentSurah = null;
@@ -177,11 +177,17 @@ class QuranApp {
     
     async loadSurahs() {
         try {
-            const response = await fetch(`${this.API_BASE}/chapters`);
+            const response = await fetch(`${this.API_BASE}/surah`);
             const data = await response.json();
             
-            if (data.chapters) {
-                this.surahs = data.chapters;
+            if (data.data) {
+                this.surahs = data.data.map(surah => ({
+                    id: surah.number,
+                    name_arabic: surah.name,
+                    name_simple: surah.englishName,
+                    revelation_place: surah.revelationType,
+                    verses_count: surah.numberOfAyahs
+                }));
                 this.renderSurahList();
             } else {
                 throw new Error('Failed to load surahs');
@@ -248,28 +254,29 @@ class QuranApp {
     async loadAyahs(surahId) {
         try {
             // Load Arabic text
-            const arabicResponse = await fetch(`${this.API_BASE}/quran/verses/uthmani?chapter_number=${surahId}`);
+            const arabicResponse = await fetch(`${this.API_BASE}/surah/${surahId}`);
             const arabicData = await arabicResponse.json();
             
             // Load translation if needed
             let translationData = null;
             if (this.settings.translation !== 'none') {
-                const translationResponse = await fetch(`${this.API_BASE}/quran/translations/${this.settings.translation}?chapter_number=${surahId}`);
+                const translationResponse = await fetch(`${this.API_BASE}/surah/${surahId}/en.sahih`);
                 translationData = await translationResponse.json();
             }
             
-            // Load word by word data
-            const wordResponse = await fetch(`${this.API_BASE}/quran/verses/text_uthmani?chapter_number=${surahId}&words=true`);
-            const wordData = await wordResponse.json();
+            if (!arabicData.data || !arabicData.data.ayahs) {
+                throw new Error('Invalid response format');
+            }
             
             // Combine data
-            this.ayahs = arabicData.verses.map((verse, index) => ({
-                id: verse.id,
-                verse_number: verse.verse_number,
-                verse_key: verse.verse_key,
-                text_uthmani: verse.text_uthmani,
-                translation: translationData ? translationData.translations[index]?.text : null,
-                words: wordData.verses[index]?.words || []
+            this.ayahs = arabicData.data.ayahs.map((verse, index) => ({
+                id: verse.number,
+                verse_number: verse.numberInSurah,
+                verse_key: `${surahId}:${verse.numberInSurah}`,
+                text_uthmani: verse.text,
+                translation: translationData && translationData.data && translationData.data.ayahs[index] 
+                    ? translationData.data.ayahs[index].text : null,
+                words: [] // Word by word will be loaded separately if needed
             }));
             
         } catch (error) {
@@ -412,14 +419,29 @@ class QuranApp {
     
     async getAudioUrl(verseKey) {
         try {
-            const response = await fetch(`${this.API_BASE}/quran/verses/audio?recitation=${this.settings.reciter}&verse_key=${verseKey}`);
-            const data = await response.json();
+            // Extract surah and ayah from verse_key (format: "1:1")
+            const [surahNum, ayahNum] = verseKey.split(':');
             
-            if (data.audio_url) {
-                return data.audio_url;
-            } else {
-                throw new Error('Audio URL not found');
-            }
+            // Use EveryAyah.com audio service with different reciters
+            const reciterMap = {
+                '7': 'Mishary_Rashid_Alafasy_128kbps', // Mishary Rashid Alafasy
+                '1': 'Abdul_Basit_Murattal_192kbps',   // Abdul Basit
+                '2': 'Saad_Al-Ghamdi_64kbps',         // Saad Al-Ghamdi
+                '4': 'Maher_AlMuaiqly_64kbps',        // Maher Al-Muaiqly
+                '6': 'Yasser_Ad-Dussary_128kbps'      // Yasser Al-Dosari
+            };
+            
+            const reciterDir = reciterMap[this.settings.reciter] || reciterMap['7'];
+            
+            // Format ayah number with leading zeros (3 digits)
+            const formattedAyah = ayahNum.toString().padStart(3, '0');
+            const formattedSurah = surahNum.toString().padStart(3, '0');
+            
+            // Construct audio URL
+            const audioUrl = `https://www.everyayah.com/data/${reciterDir}/${formattedSurah}${formattedAyah}.mp3`;
+            
+            return audioUrl;
+            
         } catch (error) {
             console.error('Error getting audio URL:', error);
             throw error;
@@ -687,15 +709,14 @@ class QuranApp {
         try {
             this.showModalLoading('tafsir');
             
-            const response = await fetch(`${this.API_BASE}/quran/tafsirs/${this.settings.tafsir}/verses/${verseKey}`);
-            const data = await response.json();
+            // For now, show a simple tafsir interface
+            // In future versions, this can be connected to a tafsir API
+            const [surahNum, ayahNum] = verseKey.split(':');
+            const tafsir = {
+                text: `Tafsir for Surah ${surahNum}, Ayah ${ayahNum} will be available when connected to a tafsir service. This verse contains important guidance and wisdom from the Quran.`
+            };
             
-            if (data.tafsirs && data.tafsirs.length > 0) {
-                const tafsir = data.tafsirs[0];
-                this.displayTafsir(tafsir, verseKey);
-            } else {
-                throw new Error('Tafsir not found');
-            }
+            this.displayTafsir(tafsir, verseKey);
             
         } catch (error) {
             console.error('Error loading tafsir:', error);
