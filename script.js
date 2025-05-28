@@ -83,14 +83,11 @@ class QuranApp {
         // Modal elements
         this.settingsModal = document.getElementById('settings-modal');
         this.bookmarksModal = document.getElementById('bookmarks-modal');
-        this.tafsirModal = document.getElementById('tafsir-modal');
         this.translationSelect = document.getElementById('translation-select');
-        this.tafsirSelect = document.getElementById('tafsir-select');
         this.loopModeSelect = document.getElementById('loop-mode-select');
         this.autoScrollToggle = document.getElementById('auto-scroll-toggle');
         this.bookmarksList = document.getElementById('bookmarks-list');
         this.noBookmarks = document.getElementById('no-bookmarks');
-        this.tafsirContent = document.getElementById('tafsir-content');
         
         // Toast container
         this.toastContainer = document.getElementById('toast-container');
@@ -157,7 +154,6 @@ class QuranApp {
         
         // Settings modal events
         this.translationSelect?.addEventListener('change', (e) => this.changeTranslation(e.target.value));
-        this.tafsirSelect?.addEventListener('change', (e) => this.changeTafsir(e.target.value));
         this.loopModeSelect?.addEventListener('change', (e) => this.changeLoopMode(e.target.value));
         this.autoScrollToggle?.addEventListener('change', (e) => this.toggleAutoScroll(e.target.checked));
         
@@ -308,9 +304,7 @@ class QuranApp {
                         <button class="ayah-btn" onclick="app.playFromAyah(${ayah.verse_number})" title="Play from this ayah">
                             <i class="fas fa-play-circle"></i>
                         </button>
-                        <button class="ayah-btn" onclick="app.showTafsir('${ayah.verse_key}')" title="Show tafsir">
-                            <i class="fas fa-comment-alt"></i>
-                        </button>
+
                         <button class="ayah-btn ${this.isBookmarked(ayah.verse_key) ? 'bookmarked' : ''}" 
                                 onclick="app.toggleBookmark('${ayah.verse_key}')" title="Bookmark this ayah">
                             <i class="fas fa-heart"></i>
@@ -701,53 +695,7 @@ class QuranApp {
         this.showToast(message);
     }
     
-    // Tafsir functionality
-    async showTafsir(verseKey) {
-        try {
-            this.showModalLoading('tafsir');
-            
-            // Load tafsir from AlQuran.cloud API
-            const [surahNum, ayahNum] = verseKey.split(':');
-            const response = await fetch(`${this.API_BASE}/ayah/${surahNum}:${ayahNum}/editions/quran-simple,en.jalalayn`);
-            const data = await response.json();
-            
-            if (data.data && data.data.length >= 2) {
-                const tafsir = {
-                    text: data.data[1].text || 'Tafsir not available for this verse.'
-                };
-                this.displayTafsir(tafsir, verseKey);
-            } else {
-                // Fallback if tafsir API doesn't work
-                const tafsir = {
-                    text: `This is verse ${ayahNum} from Surah ${this.currentSurah ? this.currentSurah.name_simple : surahNum}. For detailed tafsir commentary, please consult authentic Islamic sources and scholars.`
-                };
-                this.displayTafsir(tafsir, verseKey);
-            }
-            
-        } catch (error) {
-            console.error('Error loading tafsir:', error);
-            // Show fallback content instead of error
-            const [surahNum, ayahNum] = verseKey.split(':');
-            const tafsir = {
-                text: `This is verse ${ayahNum} from Surah ${this.currentSurah ? this.currentSurah.name_simple : surahNum}. For detailed tafsir commentary, please consult authentic Islamic sources and scholars.`
-            };
-            this.displayTafsir(tafsir, verseKey);
-        }
-    }
-    
-    displayTafsir(tafsir, verseKey) {
-        if (!this.tafsirContent) return;
-        
-        const [surahNum, ayahNum] = verseKey.split(':');
-        const surahName = this.currentSurah ? this.currentSurah.name_simple : `Surah ${surahNum}`;
-        
-        this.tafsirContent.innerHTML = `
-            <h4>${surahName} - Ayah ${ayahNum}</h4>
-            <div class="tafsir-text">${tafsir.text}</div>
-        `;
-        
-        this.openModal('tafsir');
-    }
+
     
     // Bookmark functionality
     toggleBookmark(verseKey) {
