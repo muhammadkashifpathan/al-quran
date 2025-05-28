@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Al-Quran - Read, Listen & Explore</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>Loading Al-Quran...</p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="app-title">
+                    <i class="fas fa-book-quran"></i>
+                    Al-Quran
+                </h1>
+            </div>
+            
+            <div class="header-center">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="search-input" placeholder="Search Surah..." aria-label="Search Surah">
+                    <button id="clear-search" class="clear-search" aria-label="Clear search">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <button id="bookmarks-btn" class="header-btn" aria-label="View bookmarks">
+                    <i class="fas fa-bookmark"></i>
+                </button>
+                <button id="settings-btn" class="header-btn" aria-label="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <button id="theme-toggle" class="header-btn" aria-label="Toggle theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>Surahs</h3>
+                <div class="surah-count">114 Chapters</div>
+            </div>
+            <div class="sidebar-content">
+                <div id="surah-list" class="surah-list">
+                    <!-- Surah list will be populated by JavaScript -->
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Welcome Screen -->
+            <div id="welcome-screen" class="welcome-screen">
+                <div class="welcome-content">
+                    <div class="welcome-icon">
+                        <i class="fas fa-book-quran"></i>
+                    </div>
+                    <h2>Welcome to Al-Quran</h2>
+                    <p>Select a Surah from the sidebar to begin reading, listening, and exploring the Holy Quran.</p>
+                    <div class="welcome-features">
+                        <div class="feature">
+                            <i class="fas fa-volume-up"></i>
+                            <span>Audio Recitation</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-language"></i>
+                            <span>Multiple Translations</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-bookmark"></i>
+                            <span>Bookmarks</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-comment-alt"></i>
+                            <span>Tafsir Commentary</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Surah Content -->
+            <div id="surah-content" class="surah-content hidden">
+                <div class="surah-header">
+                    <div class="surah-info">
+                        <h2 id="surah-title">Surah Name</h2>
+                        <div class="surah-meta">
+                            <span id="surah-meta-info">Meccan • 7 Ayahs</span>
+                        </div>
+                    </div>
+                    <div class="surah-controls">
+                        <button id="word-by-word-toggle" class="control-btn" aria-label="Toggle word by word">
+                            <i class="fas fa-align-left"></i>
+                            Word by Word
+                        </button>
+                        <button id="play-surah" class="control-btn primary" aria-label="Play entire surah">
+                            <i class="fas fa-play"></i>
+                            Play Surah
+                        </button>
+                    </div>
+                </div>
+
+                <div id="ayah-container" class="ayah-container">
+                    <!-- Ayahs will be populated by JavaScript -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Audio Player -->
+    <div id="audio-player" class="audio-player hidden">
+        <div class="audio-controls">
+            <button id="prev-ayah" class="audio-btn" aria-label="Previous ayah">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <button id="play-pause" class="audio-btn primary" aria-label="Play/Pause">
+                <i class="fas fa-play"></i>
+            </button>
+            <button id="next-ayah" class="audio-btn" aria-label="Next ayah">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <button id="loop-toggle" class="audio-btn" aria-label="Toggle loop">
+                <i class="fas fa-redo"></i>
+            </button>
+        </div>
+        
+        <div class="audio-info">
+            <div class="current-ayah-info">
+                <span id="current-ayah-text">No ayah selected</span>
+            </div>
+            <div class="audio-progress">
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+                <div class="time-info">
+                    <span id="current-time">0:00</span>
+                    <span id="duration">0:00</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="audio-options">
+            <select id="reciter-select" class="reciter-select" aria-label="Select reciter">
+                <option value="7">Mishary Rashid Alafasy</option>
+                <option value="1">Abdul Basit</option>
+                <option value="2">Saad Al-Ghamdi</option>
+                <option value="4">Maher Al-Muaiqly</option>
+                <option value="6">Yasser Al-Dosari</option>
+            </select>
+            <button id="close-player" class="audio-btn" aria-label="Close player">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Settings</h3>
+                <button id="close-settings" class="close-btn" aria-label="Close settings">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <label for="translation-select">Translation:</label>
+                    <select id="translation-select">
+                        <option value="131">English - Saheeh International</option>
+                        <option value="20">English - Pickthall</option>
+                        <option value="92">Urdu - Jalandhry</option>
+                        <option value="none">Arabic Only</option>
+                    </select>
+                </div>
+                
+                <div class="setting-group">
+                    <label for="tafsir-select">Tafsir:</label>
+                    <select id="tafsir-select">
+                        <option value="169">Ibn Kathir</option>
+                        <option value="157">Al-Jalalayn</option>
+                    </select>
+                </div>
+                
+                <div class="setting-group">
+                    <label for="loop-mode-select">Loop Mode:</label>
+                    <select id="loop-mode-select">
+                        <option value="none">No Loop</option>
+                        <option value="ayah">Loop Current Ayah</option>
+                        <option value="surah">Loop Entire Surah</option>
+                    </select>
+                </div>
+                
+                <div class="setting-group">
+                    <label for="auto-scroll-toggle">Auto Scroll:</label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="auto-scroll-toggle" checked>
+                        <span class="slider"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bookmarks Modal -->
+    <div id="bookmarks-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Bookmarks</h3>
+                <button id="close-bookmarks" class="close-btn" aria-label="Close bookmarks">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="bookmarks-list" class="bookmarks-list">
+                    <!-- Bookmarks will be populated by JavaScript -->
+                </div>
+                <div id="no-bookmarks" class="no-bookmarks hidden">
+                    <i class="fas fa-bookmark"></i>
+                    <p>No bookmarks yet. Click the heart icon on any ayah to bookmark it.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tafsir Modal -->
+    <div id="tafsir-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Tafsir</h3>
+                <button id="close-tafsir" class="close-btn" aria-label="Close tafsir">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="tafsir-content" class="tafsir-content">
+                    <!-- Tafsir content will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container">
+        <!-- Toast notifications will be added by JavaScript -->
+    </div>
+
+    <!-- Hidden Audio Element -->
+    <audio id="audio-element" preload="none"></audio>
+
+    <script src="script.js"></script>
+</body>
+</html>
