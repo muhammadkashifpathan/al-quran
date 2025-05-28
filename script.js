@@ -20,10 +20,8 @@ class QuranApp {
             theme: 'light',
             reciter: '7', // Mishary Rashid Alafasy
             translation: 'en.sahih', // English - Saheeh International
-            tafsir: '169', // Ibn Kathir
             loopMode: 'none', // none, ayah, surah
-            autoScroll: true,
-            wordByWord: false
+            autoScroll: true
         };
         
         // Audio State
@@ -63,7 +61,6 @@ class QuranApp {
         // Surah header elements
         this.surahTitle = document.getElementById('surah-title');
         this.surahMetaInfo = document.getElementById('surah-meta-info');
-        this.wordByWordToggle = document.getElementById('word-by-word-toggle');
         this.playSurahBtn = document.getElementById('play-surah');
         
         // Audio player elements
@@ -134,7 +131,6 @@ class QuranApp {
         this.bookmarksBtn?.addEventListener('click', () => this.openModal('bookmarks'));
         
         // Surah controls
-        this.wordByWordToggle?.addEventListener('click', () => this.toggleWordByWord());
         this.playSurahBtn?.addEventListener('click', () => this.playSurah());
         
         // Audio player controls
@@ -315,24 +311,11 @@ class QuranApp {
                 <div class="ayah-text-arabic">${ayah.text_uthmani}</div>
                 
                 ${ayah.translation ? `<div class="ayah-translation ${this.settings.translation.startsWith('ur.') ? 'urdu' : ''}">${ayah.translation}</div>` : ''}
-                
-                <div class="word-by-word ${this.settings.wordByWord ? 'visible' : ''}">
-                    <div class="word-container">
-                        ${this.renderWordByWord(ayah.words)}
-                    </div>
-                </div>
             </div>
         `).join('');
     }
     
-    renderWordByWord(words) {
-        return words.map(word => `
-            <div class="word-item">
-                <div class="word-arabic">${word.text_uthmani}</div>
-                <div class="word-translation">${word.translation?.text || ''}</div>
-            </div>
-        `).join('');
-    }
+
     
     async playAyah(verseNumber) {
         try {
@@ -678,22 +661,7 @@ class QuranApp {
         }
     }
     
-    // Word by word functionality
-    toggleWordByWord() {
-        this.settings.wordByWord = !this.settings.wordByWord;
-        this.saveSettings();
-        
-        // Update button state
-        this.wordByWordToggle?.classList.toggle('active', this.settings.wordByWord);
-        
-        // Update all word-by-word displays
-        document.querySelectorAll('.word-by-word').forEach(element => {
-            element.classList.toggle('visible', this.settings.wordByWord);
-        });
-        
-        const message = this.settings.wordByWord ? 'Word by word enabled' : 'Word by word disabled';
-        this.showToast(message);
-    }
+
     
 
     
