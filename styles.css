@@ -46,6 +46,7 @@
     /* Typography */
     --font-family-arabic: 'Scheherazade New', 'Noto Sans Arabic', 'Amiri', serif;
     --font-family-urdu: 'Noto Nastaliq Urdu', serif;
+    --font-family-pashto: 'Noto Sans Arabic', 'Scheherazade New', serif;
     --font-family-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     
     /* Transitions */
@@ -137,13 +138,18 @@ body {
 
 .header-content {
     display: flex;
-    align-items: center;
     justify-content: space-between;
     padding: var(--space-md) var(--space-lg);
     max-width: 1400px;
     margin: 0 auto;
+    flex-direction: column;
+    gap: 10px;
 }
 
+.header-left-box {
+    display: flex;
+    justify-content: space-between;
+}
 .header-left {
     display: flex;
     align-items: center;
@@ -177,7 +183,6 @@ body {
 
 .header-center {
     flex: 1;
-    max-width: 400px;
     margin: 0 var(--space-xl);
 }
 
@@ -375,12 +380,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100%;
     text-align: center;
-}
-
-.welcome-content {
-    max-width: 500px;
 }
 
 .welcome-icon {
@@ -412,6 +412,18 @@ body {
     align-items: center;
     gap: var(--space-sm);
     color: hsl(var(--text-secondary));
+    flex-direction: column;
+    box-shadow: var(--shadow-lg);
+    border-radius: var(--radius);
+    padding: 20px 10px;
+    border: 1px solid hsl(var(--border-light));
+    transition: all 0.5s ease;
+}
+
+.feature:hover {
+    background: hsl(var(--surface-alt));
+    border-color: hsl(var(--primary) / 0.2);
+    transform: scale(1.02);
 }
 
 .feature i {
@@ -419,6 +431,10 @@ body {
     font-size: 1.2rem;
 }
 
+.feature span {
+    font-weight: 800;
+    color: var();
+}
 /* Surah Content */
 .surah-content.hidden {
     display: none;
@@ -570,6 +586,14 @@ body {
 
 .ayah-translation.urdu {
     font-family: var(--font-family-urdu);
+    direction: rtl;
+    text-align: right;
+    font-size: 1.2rem;
+    line-height: 2;
+}
+
+.ayah-translation.pashto {
+    font-family: var(--font-family-pashto);
     direction: rtl;
     text-align: right;
     font-size: 1.2rem;
@@ -1029,7 +1053,6 @@ input:checked + .slider:before {
     .sidebar {
         position: fixed;
         left: 0;
-        top: 72px;
         height: calc(100vh - 72px);
         z-index: 1500;
         transform: translateX(-100%);

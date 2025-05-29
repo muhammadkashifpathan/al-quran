@@ -310,7 +310,7 @@ class QuranApp {
                 
                 <div class="ayah-text-arabic">${ayah.text_uthmani}</div>
                 
-                ${ayah.translation ? `<div class="ayah-translation ${this.settings.translation.startsWith('ur.') ? 'urdu' : ''}">${ayah.translation}</div>` : ''}
+                ${ayah.translation ? `<div class="ayah-translation ${this.settings.translation.startsWith('ur.') ? 'urdu' : this.settings.translation.startsWith('ps.') ? 'pashto' : ''}">${ayah.translation}</div>` : ''}
             </div>
         `).join('');
     }
